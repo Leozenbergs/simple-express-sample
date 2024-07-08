@@ -13,7 +13,7 @@ class AuthorController {
   static async get(req, res) {
     try {
       const id = req.params.id;
-      const author = await a.findById(id);
+      const author = await Author.findById(id);
       res.json(author);
     } catch (error) {
       res.status(500).json({ message: error.message });
