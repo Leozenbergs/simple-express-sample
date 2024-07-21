@@ -1,17 +1,17 @@
-import mongoose from 'mongoose';
 import { Author } from '../models/Author.js';
+import { NotFoundError } from '../errors/index.js';
 
 class AuthorController {
-  static async getAll(req, res) {
+  static async getAll(req, res, next) {
     try {
       const authors = await Author.find({});
       res.json(authors);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      next(error);
     }
   }
 
-  static async get(req, res) {
+  static async get(req, res, next) {
     try {
       const id = req.params.id;
       const author = await Author.findById(id);
@@ -19,16 +19,13 @@ class AuthorController {
       if(author !== null) {
         res.status(200).json(author);
       } else {
-        res.status(404).json({ message: 'Author not found' });
+        next(new NotFoundError("Id not found"));
       }
     } catch (error) {
-      if(error instanceof mongoose.Error.CastError) {
-        res.status(400).json({ message: 'Invalid ID' });
-      } 
-      res.status(500).json({ message: error.message });
+      next(error);
     }
   }
-  static async register(req, res) {
+  static async register(req, res, next) {
     try {
       const author = await Author.create(req.body)
       res.status(201).json({
@@ -36,27 +33,32 @@ class AuthorController {
         author
       });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      next(error)
     }
   }
 
-  static async update(req, res) {
+  static async update(req, res, next) {
     try {
       const id = req.params.id;
-      await Author.findByIdAndUpdate(id, req.body);
-      res.json({ message: 'Updated'});
+      const author = await Author.findByIdAndUpdate(id, req.body);
+
+      if(author !== null) {
+        res.json({ message: 'Updated'});
+      } else {
+        next(new NotFoundError("Author not found"));
+      }
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      next(error)
     }
   }
 
-  static async delete(req, res) {
+  static async delete(req, res, next) {
     try {
       const id = req.params.id;
       await Author.findByIdAndDelete(id);
       res.json({ message: 'Deleted'});
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      next(error)
     }
   }
 }
