@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { BaseError, NotFoundError, WrongRequestError, ValidationError } from "../errors/index.js";
+import { BaseError, WrongRequestError, ValidationError } from "../errors/index.js";
 
 // eslint-disable-next-line no-unused-vars
 export default function errorHandler (err, req, res, next) {
